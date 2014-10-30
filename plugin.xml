@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        id="info.protonet.imageresizer" version="0.1">
+  <name>Image Resizer</name>
+  <description>Plugin for resizing images only with the uri of the image.</description>
+  <author>Joschka Schulz</author>
+  <license>Apache 2.0</license>
+  <keywords>cordova,device,resize,image</keywords>
+  <repo>https://github.com/protonet/cordova-plugin-image-resizer.git</repo>
+
+  <js-module src="www/image_resizer.js" name="ImageResizer">
+    <clobbers target="ImageResizer" />
+  </js-module>
+
+  <!-- android -->
+  <platform name="android">
+    <config-file target="res/xml/config.xml" parent="/*">
+      <feature name="ImageResizer">
+        <param name="android-package" value="info.protonet.imageresizer.ImageResizer"/>
+      </feature>
+    </config-file>
+    <config-file target="AndroidManifest.xml" parent="/*">
+      <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    </config-file>
+
+    <source-file src="src/android/ImageResizer.java" target-dir="src/info/protonet/imageresizer" />
+  </platform>
+</plugin>
