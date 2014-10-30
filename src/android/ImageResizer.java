@@ -14,5 +14,7 @@ public class ImageResizer extends CordovaPlugin {
     this.callbackContext = callbackContext;
 
     Log.i("Protonet", "Dieses Plugin funktioniert :D");
+
+    return true;
   }
 }
