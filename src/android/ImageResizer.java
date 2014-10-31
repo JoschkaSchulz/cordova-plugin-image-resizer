@@ -30,11 +30,11 @@ import android.os.Environment;
 
 public class ImageResizer extends CordovaPlugin {
   private static final int ARGUMENT_NUMBER = 1;
-  private static final String FOLDER_NAME = "Protonet Messenger";
   public CallbackContext callbackContext;
 
   private String uri;
   private String folderName;
+  private int quality;
   private int width;
   private int height;
 
@@ -49,6 +49,7 @@ public class ImageResizer extends CordovaPlugin {
         JSONObject jsonObject = args.getJSONObject(0);
         uri = jsonObject.getString("uri");
         folderName = jsonObject.getString("folderName");
+        quality = jsonObject.getInt("quality");
         width = jsonObject.getInt("width");
         height = jsonObject.getInt("height");
 
@@ -111,7 +112,7 @@ public class ImageResizer extends CordovaPlugin {
       if(file.exists()) file.delete();
       try {
         FileOutputStream out = new FileOutputStream(file);
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, out);
         out.flush();
         out.close();
       } catch(Exception e) {
