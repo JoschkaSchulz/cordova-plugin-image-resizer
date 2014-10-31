@@ -100,7 +100,7 @@ public class ImageResizer extends CordovaPlugin {
   }
 
   private Uri saveFile(Bitmap bitmap) {
-    File folder = new File(Environment.getExternalStorageDirectory() + "/" + FOLDER_NAME);
+    File folder = new File(Environment.getExternalStorageDirectory() + "/" + folderName);
     boolean success = true;
     if (!folder.exists()) {
       success = folder.mkdir();
