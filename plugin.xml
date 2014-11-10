@@ -25,4 +25,17 @@
 
     <source-file src="src/android/ImageResizer.java" target-dir="src/info/protonet/imageresizer" />
   </platform>
+
+  <platform name="ios">
+    <config-file parent="/*" target="config.xml">
+        <feature name="ImageResizer">
+            <param name="ios-package" value="ImageResizer" />
+        </feature>
+    </config-file>
+
+    <header-file src="src/ios/ImageResizer.h" />
+    <source-file src="src/ios/ImageResizer.m" />
+
+    <framework src="MobileCoreServices.framework" />
+  </platform>
 </plugin>
