@@ -74,7 +74,6 @@
     if (![data writeToFile:filePath options:NSAtomicWrite error:&err]) {
         result = [CDVPluginResult resultWithStatus:CDVCommandStatus_IO_EXCEPTION messageAsString:[err localizedDescription]];
     } else {
-        NSLog(@"Filepath: %@", filePath);
         result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[[NSURL fileURLWithPath:filePath] absoluteString]];
     }
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
