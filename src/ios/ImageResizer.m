@@ -13,10 +13,7 @@
     NSString* imageUrlString = [arguments objectForKey:@"url"];
     NSURL* imageURL = [NSURL URLWithString:imageUrlString];
     UIImage* sourceImage = [UIImage imageWithData: [NSData dataWithContentsOfURL: imageURL]];
-
-    NSNumberFormatter * f = [[NSNumberFormatter alloc] init];
-    [f setNumberStyle:NSNumberFormatterDecimalStyle];
-    NSNumber* quality = [f numberFromString:[arguments objectForKey:@"quality"]];
+    NSString* quality = [arguments objectForKey:@"quality"];
 
     CGSize frameSize = CGSizeMake([[arguments objectForKey:@"width"] floatValue], [[arguments objectForKey:@"height"] floatValue]);
     UIImage* newImage = nil;
@@ -63,7 +60,7 @@
     NSFileManager* fileMgr = [[NSFileManager alloc] init]; // recommended by apple (vs [NSFileManager defaultManager]) to be threadsafe
     // generate unique file name
     NSString* filePath;
-    NSData* data = UIImageJPEGRepresentation(newImage, quality / 100.0f);
+    NSData* data = UIImageJPEGRepresentation(newImage, [quality floatValue] / 100.0f);
 
     int i = 1;
     do {
