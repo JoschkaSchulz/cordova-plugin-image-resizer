@@ -9,7 +9,7 @@ Use the Cordova CLI and type in the following command:
 
 ## Sample Code
 
-At the moment the plugin is only avaible on the android platform.
+At the moment the plugin is only avaible on the android and ios platform.
 
 ### resize
 
