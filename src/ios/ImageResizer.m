@@ -13,7 +13,7 @@
     NSString* imageUrlString = [arguments objectForKey:@"url"];
     NSURL* imageURL = [NSURL URLWithString:imageUrlString];
     UIImage* sourceImage = [UIImage imageWithData: [NSData dataWithContentsOfURL: imageURL]];
-    CGFloat* quality = [arguments objectForKey:@"quality"];
+    CGFloat quality = [arguments objectForKey:@"quality"];
 
     CGSize frameSize = CGSizeMake([[arguments objectForKey:@"width"] floatValue], [[arguments objectForKey:@"height"] floatValue]);
     UIImage* newImage = nil;
