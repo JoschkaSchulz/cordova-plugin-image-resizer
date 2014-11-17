@@ -60,7 +60,7 @@
     NSFileManager* fileMgr = [[NSFileManager alloc] init]; // recommended by apple (vs [NSFileManager defaultManager]) to be threadsafe
     // generate unique file name
     NSString* filePath;
-    NSData* data = UIImageJPEGRepresentation(newImage, [quality floatValue] / 100.0f);
+    NSData* data = UIImageJPEGRepresentation(newImage, [quality intValue] / 100.0f);
 
     int i = 1;
     do {
