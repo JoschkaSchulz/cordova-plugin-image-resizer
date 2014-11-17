@@ -1,5 +1,5 @@
 #import <Cordova/CDVPlugin.h>
 
 @interface ImageResizer : CDVPlugin
-- (NSString *) getScaledImagePath:(NSString *)imagePath; 
+- (NSString *) resize:(NSString *)imagePath;
 @end

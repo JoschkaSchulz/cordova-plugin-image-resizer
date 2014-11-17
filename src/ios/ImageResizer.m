@@ -1,13 +1,20 @@
+#import "ImageResizer.h"
+#import <Cordova/CDV.h>
+#import <Cordova/CDVPluginResult.h>
+#import <AssetsLibrary/AssetsLibrary.h>
+
 @implementation ImageResizer
 
-- (NSString *) getScaledImagePath:(CDVInvokedUrlCommand*)command
+- (void) resize:(CDVInvokedUrlCommand*)command
 {
-    NSLog(@"CDVInvokedUrlCommand %@", command);
-    /*
-    //Get the image from the path
-    UIImage* path
+    NSDictionary* arguments = [command.arguments objectAtIndex:0];
 
-    UIImage* sourceImage = anImage;
+    //Get the image from the path
+    NSString *imageUrlString = [arguments objectForKey:@"url"];
+    NSURL *imageURL = [NSURL URLWithString:imageUrlString];
+    UIImage* sourceImage = [UIImage imageWithData: [NSData dataWithContentsOfURL: imageURL]];
+
+    CGSize frameSize = CGSizeMake([[arguments objectForKey:@"width"] floatValue], [[arguments objectForKey:@"height"] floatValue]);
     UIImage* newImage = nil;
     CGSize imageSize = sourceImage.size;
     CGFloat width = imageSize.width;
@@ -45,5 +52,28 @@
 
     // pop the context to get back to the default
     UIGraphicsEndImageContext();
-    return newImage;*/
+
+    // get the temp directory path
+    NSString* docsPath = [NSTemporaryDirectory()stringByStandardizingPath];
+    NSError* err = nil;
+    NSFileManager* fileMgr = [[NSFileManager alloc] init]; // recommended by apple (vs [NSFileManager defaultManager]) to be threadsafe
+    // generate unique file name
+    NSString* filePath;
+    NSData* data = UIImageJPEGRepresentation(newImage, 90.0f / 100.0f);
+
+    int i = 1;
+    do {
+        filePath = [NSString stringWithFormat:@"%@/%@%.%@", docsPath, @"protonet_", i++, @"jpg"];
+    } while ([fileMgr fileExistsAtPath:filePath]);
+
+    // save file
+    CDVPluginResult* result = nil;
+    if (![data writeToFile:filePath options:NSAtomicWrite error:&err]) {
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_IO_EXCEPTION messageAsString:[err localizedDescription]];
+    } else {
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[[NSURL fileURLWithPath:filePath] absoluteString]];
+    }
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
+
+@end
