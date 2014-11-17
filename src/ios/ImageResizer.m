@@ -17,7 +17,6 @@
     NSNumberFormatter * f = [[NSNumberFormatter alloc] init];
     [f setNumberStyle:NSNumberFormatterDecimalStyle];
     CGFloat quality = [f numberFromString:[arguments objectForKey:@"quality"]];
-    [f release];
 
     CGSize frameSize = CGSizeMake([[arguments objectForKey:@"width"] floatValue], [[arguments objectForKey:@"height"] floatValue]);
     UIImage* newImage = nil;
