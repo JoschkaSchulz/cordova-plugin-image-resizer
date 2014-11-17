@@ -1,5 +1,5 @@
 #import <Cordova/CDVPlugin.h>
 
 @interface ImageResizer : CDVPlugin
-- (NSString *) resize:(NSString *)imagePath;
+- (void) resize:(CDVInvokedUrlCommand*)command
 @end
