@@ -78,17 +78,22 @@ public class ImageResizer extends CordovaPlugin {
    * @params uri the URI who points to the image
    **/
   private Bitmap loadScaledBitmapFromUri(String uriString, int width, int height) {
+  Log.i("Protonet", "width: " + width + " height: " + height);
     try {
       BitmapFactory.Options options = new BitmapFactory.Options();
       options.inJustDecodeBounds = true;
       BitmapFactory.decodeStream(FileHelper.getInputStreamFromUriString(uriString, cordova), null, options);
+      Log.i("Protonet", "owidth: " + options.outWidth + " oheight: " + options.outHeight);
 
       //calc aspect ratio
+      Log.i("Protonet", "Options: " + options);
       int[] retval = calculateAspectRatio(options.outWidth, options.outHeight);
 
       options.inJustDecodeBounds = false;
       options.inSampleSize = calculateSampleSize(options.outWidth, options.outHeight, width, height);
-      return BitmapFactory.decodeStream(FileHelper.getInputStreamFromUriString(uriString, cordova), null, options);
+      Log.i("Protonet", "inSampleSize: " + options.inSampleSize);
+      Bitmap unscaledBitmap = BitmapFactory.decodeStream(FileHelper.getInputStreamFromUriString(uriString, cordova), null, options);
+      return Bitmap.createScaledBitmap(unscaledBitmap, retval[0], retval[1], true);
     } catch (FileNotFoundException e) {
       Log.e("Protonet", "File not found. :(");
     } catch (IOException e) {
