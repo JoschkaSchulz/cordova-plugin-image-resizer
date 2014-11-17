@@ -9,15 +9,15 @@
 
 - (void) resize:(CDVInvokedUrlCommand*)command
 {
+    // get the arguments and the stuff inside of it
     NSDictionary* arguments = [command.arguments objectAtIndex:0];
+    NSString* imageUrlString = [arguments objectForKey:@"uri"];
+    NSString* quality = [arguments objectForKey:@"quality"];
+    CGSize frameSize = CGSizeMake([[arguments objectForKey:@"width"] floatValue], [[arguments objectForKey:@"height"] floatValue]);
 
     //Get the image from the path
-    NSString* imageUrlString = [arguments objectForKey:@"uri"];
     NSURL* imageURL = [NSURL URLWithString:imageUrlString];
     UIImage* sourceImage = [UIImage imageWithData: [NSData dataWithContentsOfURL: imageURL]];
-    NSString* quality = [arguments objectForKey:@"quality"];
-
-    CGSize frameSize = CGSizeMake([[arguments objectForKey:@"width"] floatValue], [[arguments objectForKey:@"height"] floatValue]);
     UIImage* newImage = nil;
     CGSize imageSize = sourceImage.size;
     CGFloat width = imageSize.width;
@@ -27,6 +27,7 @@
     CGFloat scaleFactor = 0.0;
     CGSize scaledSize = frameSize;
 
+    // calculate the aspect ratio if the image is to large
     if (CGSizeEqualToSize(imageSize, frameSize) == NO) {
         CGFloat widthFactor = targetWidth / width;
         CGFloat heightFactor = targetHeight / height;
@@ -59,11 +60,11 @@
     // get the temp directory path
     NSString* docsPath = [NSTemporaryDirectory()stringByStandardizingPath];
     NSError* err = nil;
-    NSFileManager* fileMgr = [[NSFileManager alloc] init]; // recommended by apple (vs [NSFileManager defaultManager]) to be threadsafe
+    NSFileManager* fileMgr = [[NSFileManager alloc] init];
+
     // generate unique file name
     NSString* filePath;
     NSData* data = UIImageJPEGRepresentation(newImage, [quality floatValue] / 100.0f);
-
     int i = 1;
     do {
         filePath = [NSString stringWithFormat:@"%@/%@%03d.%@", docsPath, PROTONET_PHOTO_PREFIX, i++, @"jpg"];
