@@ -1,5 +1,6 @@
 # Image Resizer for Cordova #
-By Protonet
+By: Protonet
+Authors: Joschka Schulz
 
 ## Adding the Plugin ##
 
