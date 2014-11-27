@@ -32,7 +32,7 @@ At the moment the plugin is only avaible on the android and ios platform.
           width: 1280,
           height: 1280};
 
-    window.ImageResizer.resize(uri, "Protonet Messenger", 1280, 1280,
+    window.ImageResizer.resize(options,
       function(image) {
          // success: image is the new resized image
       }, function() {
