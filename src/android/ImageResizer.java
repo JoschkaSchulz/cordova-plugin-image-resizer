@@ -66,7 +66,7 @@ public class ImageResizer extends CordovaPlugin {
         callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, scaledFile.toString()));
         return true;
       } else {
-          callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR));
+        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR));
         return false;
       }
     } catch(JSONException e) {
@@ -107,7 +107,7 @@ public class ImageResizer extends CordovaPlugin {
   private Uri saveFile(Bitmap bitmap) {
     File folder = new File(Environment.getExternalStorageDirectory() + "/" + folderName);
     if (folderName.contains("/")) {
-        folder = new File(folderName.replace("file://", ""));
+      folder = new File(folderName.replace("file://", ""));
     }
     boolean success = true;
     if (!folder.exists()) {
@@ -148,9 +148,9 @@ public class ImageResizer extends CordovaPlugin {
     final float dstAspect = (float)dstWidth / (float)dstHeight;
 
     if (srcAspect > dstAspect) {
-        return srcWidth / dstWidth;
+      return srcWidth / dstWidth;
     } else {
-        return srcHeight / dstHeight;
+      return srcHeight / dstHeight;
     }
   }
 
@@ -162,49 +162,49 @@ public class ImageResizer extends CordovaPlugin {
    * @return
    */
   private int[] calculateAspectRatio(int origWidth, int origHeight) {
-      int newWidth = width;
-      int newHeight = height;
+    int newWidth = width;
+    int newHeight = height;
 
-      // If no new width or height were specified return the original bitmap
-      if (newWidth <= 0 && newHeight <= 0) {
-          newWidth = origWidth;
-          newHeight = origHeight;
-      }
-      // Only the width was specified
-      else if (newWidth > 0 && newHeight <= 0) {
-          newHeight = (newWidth * origHeight) / origWidth;
-      }
-      // only the height was specified
-      else if (newWidth <= 0 && newHeight > 0) {
-          newWidth = (newHeight * origWidth) / origHeight;
-      }
-      // If the user specified both a positive width and height
-      // (potentially different aspect ratio) then the width or height is
-      // scaled so that the image fits while maintaining aspect ratio.
-      // Alternatively, the specified width and height could have been
-      // kept and Bitmap.SCALE_TO_FIT specified when scaling, but this
-      // would result in whitespace in the new image.
-      else {
-          double newRatio = newWidth / (double) newHeight;
-          double origRatio = origWidth / (double) origHeight;
+    // If no new width or height were specified return the original bitmap
+    if (newWidth <= 0 && newHeight <= 0) {
+      newWidth = origWidth;
+      newHeight = origHeight;
+    }
+    // Only the width was specified
+    else if (newWidth > 0 && newHeight <= 0) {
+      newHeight = (newWidth * origHeight) / origWidth;
+    }
+    // only the height was specified
+    else if (newWidth <= 0 && newHeight > 0) {
+      newWidth = (newHeight * origWidth) / origHeight;
+    }
+    // If the user specified both a positive width and height
+    // (potentially different aspect ratio) then the width or height is
+    // scaled so that the image fits while maintaining aspect ratio.
+    // Alternatively, the specified width and height could have been
+    // kept and Bitmap.SCALE_TO_FIT specified when scaling, but this
+    // would result in whitespace in the new image.
+    else {
+      double newRatio = newWidth / (double) newHeight;
+      double origRatio = origWidth / (double) origHeight;
 
-          if (origRatio > newRatio) {
-              newHeight = (newWidth * origHeight) / origWidth;
-          } else if (origRatio < newRatio) {
-              newWidth = (newHeight * origWidth) / origHeight;
-          }
+      if (origRatio > newRatio) {
+        newHeight = (newWidth * origHeight) / origWidth;
+      } else if (origRatio < newRatio) {
+        newWidth = (newHeight * origWidth) / origHeight;
       }
+    }
 
-      int[] retval = new int[2];
-      retval[0] = newWidth;
-      retval[1] = newHeight;
-      return retval;
+    int[] retval = new int[2];
+    retval[0] = newWidth;
+    retval[1] = newHeight;
+    return retval;
   }
 
   private boolean checkParameters(JSONArray args) {
     if (args.length() != ARGUMENT_NUMBER) {
-        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.INVALID_ACTION));
-        return false;
+      callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.INVALID_ACTION));
+      return false;
     }
     return true;
   }
