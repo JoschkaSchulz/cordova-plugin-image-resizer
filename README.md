@@ -20,6 +20,7 @@ At the moment the plugin is only avaible on the android and ios platform.
 ### Options
   - **uri**(String): The Uri for the image on the device to get scaled
   - **folderName**(String): The name of the folder the image should be put in
+  - **fileName**(String): A custom name for the file. Default name is a timestamp.
   - **quality**(Number): Quality given as Number for the quality of the new image
   - **width**(Number): The width of the new image,
   - **height**(Number): The height of the new image
