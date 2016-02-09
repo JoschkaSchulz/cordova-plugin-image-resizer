@@ -34,6 +34,7 @@ public class ImageResizer extends CordovaPlugin {
 
   private String uri;
   private String folderName;
+  private String fileName = null;
   private int quality;
   private int width;
   private int height;
@@ -49,6 +50,9 @@ public class ImageResizer extends CordovaPlugin {
         JSONObject jsonObject = args.getJSONObject(0);
         uri = jsonObject.getString("uri");
         folderName = jsonObject.getString("folderName");
+        if (jsonObject.has("fileName")) {
+          fileName = jsonObject.getString("fileName");
+        }
         quality = jsonObject.getInt("quality");
         width = jsonObject.getInt("width");
         height = jsonObject.getInt("height");
@@ -62,7 +66,7 @@ public class ImageResizer extends CordovaPlugin {
         callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, scaledFile.toString()));
         return true;
       } else {
-        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR));
+          callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR));
         return false;
       }
     } catch(JSONException e) {
@@ -102,13 +106,18 @@ public class ImageResizer extends CordovaPlugin {
 
   private Uri saveFile(Bitmap bitmap) {
     File folder = new File(Environment.getExternalStorageDirectory() + "/" + folderName);
+    if (folderName.contains("/")) {
+        folder = new File(folderName.replace("file://", ""));
+    }
     boolean success = true;
     if (!folder.exists()) {
       success = folder.mkdir();
     }
 
     if(success) {
-      String fileName = System.currentTimeMillis() + ".jpg";
+      if(fileName == null){
+        fileName = System.currentTimeMillis() + ".jpg";
+      }
       File file = new File(folder, fileName);
       if(file.exists()) file.delete();
       try {
