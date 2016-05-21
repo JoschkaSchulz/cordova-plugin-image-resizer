@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Storage;
@@ -13,10 +14,20 @@ namespace ImageResizerNative
         private const int ARGUMENT_NUMBER = 1;
         private static Config config;
 
-        public static IAsyncOperation<string> Resize(Config args)
+        public static string Resize(Config args)
         {
             config = args;
-            return ResizeAsync().AsAsyncOperation();
+            Task<string> t = ResizeAsync();
+            t.Wait();
+            if (t.IsFaulted)
+            {
+                Debug.WriteLine("Windows Image Resizer Error");
+                Debug.WriteLine(t.Exception.InnerException.Message);
+                Debug.WriteLine(t.Exception.InnerException.StackTrace);
+                throw t.Exception.InnerException;
+            }
+
+            return t.Result;
         }
 
         private async static Task<string> ResizeAsync()
