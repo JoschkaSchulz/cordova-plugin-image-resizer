@@ -22,13 +22,14 @@
     // Resize method
     function resizeImage(successCallback, errorCallback, config) {
         var tempPhotoFileName =  config.fileName || new Date().getTime().toString() + ".jpg";
-        var file = Windows.Storage.StorageFile.getFileFromPathAsync(config.uri);
+        var file;
         var targetWidth = config.width;
         var targetHeight = config.height;
 
         var storageFolder = getAppData().localFolder;
-        file.copyAsync(storageFolder, file.name, Windows.Storage.NameCollisionOption.replaceExisting)
+        Windows.Storage.StorageFile.getFileFromPathAsync(config.uri)
             .then(function (storageFile) {
+                file = f;
                 return fileIO.readBufferAsync(storageFile);
             })
             .then(function (buffer) {
