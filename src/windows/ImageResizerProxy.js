@@ -22,7 +22,7 @@
     // Resize method
     function resizeImage(successCallback, errorCallback, config) {
         var tempPhotoFileName =  config.fileName || new Date().getTime().toString() + ".jpg";
-        var file = Windows.Storage.StorageFile.GetFileFromPathAsync(config.uri);
+        var file = Windows.Storage.StorageFile.getFileFromPathAsync(config.uri);
         var targetWidth = config.width;
         var targetHeight = config.height;
 
