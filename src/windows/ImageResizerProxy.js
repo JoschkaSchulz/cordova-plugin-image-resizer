@@ -18,6 +18,9 @@
     var getAppData = function () {
         return Windows.Storage.ApplicationData.current;
     };
+    var encodeToBase64String = function (buffer) {
+        return Windows.Security.Cryptography.CryptographicBuffer.encodeToBase64String(buffer);
+    };
 
     // Resize method
     function resizeImage(successCallback, errorCallback, config) {
