@@ -25,9 +25,9 @@
         var file;
         var targetWidth = config.width;
         var targetHeight = config.height;
-
+        var uri = new Windows.Foundation.Uri(config.uri);
         var storageFolder = getAppData().localFolder;
-        Windows.Storage.StorageFile.getFileFromApplicationUriAsync(config.uri)
+        Windows.Storage.StorageFile.getFileFromApplicationUriAsync(uri)
             .then(function (storageFile) {
                 file = f;
                 return fileIO.readBufferAsync(storageFile);
