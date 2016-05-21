@@ -44,6 +44,6 @@
         <js-module src="src/windows/ImageResizerProxy.js" name="ImageResizerProxy">
             <merges target="" />
         </js-module>
-        <framework src="src/windows/ImageResizer/ImageResizerNativeLibrary/ImageResizerNativeLibrary.csproj" custom="true" target="windows"/>
+        <framework src="src/windows/ImageResizer/ImageResizerNativeLibrary/ImageResizerNativeLibrary.csproj" custom="true" type="projectRefgerence" target="win"/>
   </platform>
 </plugin>
