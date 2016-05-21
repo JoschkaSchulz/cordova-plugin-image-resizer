@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -14,9 +15,9 @@ namespace ImageResizerNative
         private const int ARGUMENT_NUMBER = 1;
         private static Config config;
 
-        public static string Resize(Config args)
+        public static string Resize(string args)
         {
-            config = args;
+            config = JsonConvert.DeserializeObject<Config>(args);
             Task<string> t = ResizeAsync();
             t.Wait();
             if (t.IsFaulted)
@@ -32,7 +33,7 @@ namespace ImageResizerNative
 
         private async static Task<string> ResizeAsync()
         {
-            WriteableBitmap resized = await ResizedImage(await StorageFile.GetFileFromPathAsync(config.Uri), config.Width, config.Height);
+            WriteableBitmap resized = await ResizedImage(await StorageFile.GetFileFromPathAsync(config.uri), config.width, config.height);
 
             string filePath = await saveFile(resized);
 
@@ -60,16 +61,14 @@ namespace ImageResizerNative
             await source.SetSourceAsync(await imageFile.OpenAsync(FileAccessMode.Read));
             return source.Resize(maxWidth, maxHeight, WriteableBitmapExtensions.Interpolation.Bilinear);
         }
-
-    }
-
-    public sealed class Config
-    {
-        public string Uri { get; set; }
-        public string FolderName { get; set; }
-        public string FileName { get; set; }
-        public int Quality { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
+        private sealed class Config
+        {
+            public string uri { get; set; }
+            public string folderName { get; set; }
+            public string fileName { get; set; }
+            public int quality { get; set; }
+            public int width { get; set; }
+            public int height { get; set; }
+        }
     }
 }
