@@ -27,7 +27,7 @@
         var targetHeight = config.height;
 
         var storageFolder = getAppData().localFolder;
-        Windows.Storage.StorageFile.getFileFromPathAsync(config.uri)
+        Windows.Storage.StorageFile.getFileFromApplicationUriAsync(config.uri)
             .then(function (storageFile) {
                 file = f;
                 return fileIO.readBufferAsync(storageFile);
