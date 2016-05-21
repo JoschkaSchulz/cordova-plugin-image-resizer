@@ -7,7 +7,7 @@
     <ProjectGuid>{628BC26A-7B50-4945-8A5A-5292036EAB12}</ProjectGuid>
     <OutputType>winmdobj</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ImageResizer</RootNamespace>
+    <RootNamespace>ImageResizerNative</RootNamespace>
     <AssemblyName>ImageResizer</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
