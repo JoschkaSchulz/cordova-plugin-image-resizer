@@ -1,4 +1,4 @@
-﻿var ImageResizerProxy = {
+﻿cordova.commandProxy.add("ImageResizer",{
     resize: function (win, fail, args, env) {
         try {
             var filePath = ImageResizer.ImageResizer.resize(args);
@@ -7,6 +7,4 @@
             fail(e);
         }
     }
-};
-
-require("cordova/exec/proxy").add("ImageResizer", ImageResizerProxy);
+});
