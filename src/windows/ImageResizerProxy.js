@@ -29,7 +29,7 @@
         var storageFolder = getAppData().localFolder;
         Windows.Storage.StorageFile.getFileFromApplicationUriAsync(uri)
             .then(function (storageFile) {
-                file = f;
+                file = storageFile;
                 return fileIO.readBufferAsync(storageFile);
             })
             .then(function (buffer) {
