@@ -13,20 +13,14 @@ namespace ImageResizerNative
         private const int ARGUMENT_NUMBER = 1;
         private static Config config;
 
-        public static IAsyncOperation<string> Resize(object args)
+        public static IAsyncOperation<string> Resize(Config args)
         {
-            return ResizeAsync(new JArray(args)).AsAsyncOperation();
+            config = args;
+            return ResizeAsync().AsAsyncOperation();
         }
 
-        private async static Task<string> ResizeAsync(JArray args)
+        private async static Task<string> ResizeAsync()
         {
-            if (checkParameters(args))
-            {
-                throw new Exception("Invalid arguments");
-            }
-            // get the arguments
-            config = args[0].ToObject<Config>();
-
             WriteableBitmap resized = await ResizedImage(await StorageFile.GetFileFromPathAsync(config.Uri), config.Width, config.Height);
 
             string filePath = await saveFile(resized);
@@ -54,15 +48,6 @@ namespace ImageResizerNative
             WriteableBitmap source = new WriteableBitmap(Convert.ToInt32(picInfo.Width), Convert.ToInt32(picInfo.Height));
             await source.SetSourceAsync(await imageFile.OpenAsync(FileAccessMode.Read));
             return source.Resize(maxWidth, maxHeight, WriteableBitmapExtensions.Interpolation.Bilinear);
-        }
-
-        private static bool checkParameters(JArray args)
-        {
-            if (args.Count != ARGUMENT_NUMBER)
-            {
-                return false;
-            }
-            return true;
         }
 
     }
