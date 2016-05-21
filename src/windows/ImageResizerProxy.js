@@ -1,4 +1,4 @@
-﻿var ImageResizer = {
+﻿var ImageResizerProxy = {
     resize: function (win, fail, args, env) {
         try {
             var filePath = ImageResizer.ImageResizer.resize(args);
@@ -9,4 +9,4 @@
     }
 };
 
-require("cordova/exec/proxy").add("ImageResizer", ImageResizer);
+require("cordova/exec/proxy").add("ImageResizer", ImageResizerProxy);
