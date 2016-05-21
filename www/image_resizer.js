@@ -3,8 +3,8 @@ var ImageResizer = function() {};
 ImageResizer.prototype.resize = function(options, success, fail) {
   cordova.exec(function(uri) {
     success(uri);
-  }, function() {
-    fail();
+  }, function(e) {
+    fail(e);
   }, "ImageResizer", "resize", [options]);
 };
 
