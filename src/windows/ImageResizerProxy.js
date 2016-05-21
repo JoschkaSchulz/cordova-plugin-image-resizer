@@ -15,6 +15,7 @@
     };
 
     var fileIO = Windows.Storage.FileIO;
+    var OptUnique = Windows.Storage.CreationCollisionOption.generateUniqueName;
     var getAppData = function () {
         return Windows.Storage.ApplicationData.current;
     };
