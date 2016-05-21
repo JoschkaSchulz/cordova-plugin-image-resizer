@@ -3,7 +3,7 @@
     var ImageResizerProxy = {
         resize: function (win, fail, args, env) {
             try {
-                var filePath = ImageResizer.ImageResizer.resize(args);
+                var filePath = ImageResizerNative.ImageResizer.resize(args);
                 win(filePath);
             } catch (e) {
                 fail(e);
