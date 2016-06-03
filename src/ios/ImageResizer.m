@@ -14,6 +14,7 @@
     NSString* imageUrlString = [arguments objectForKey:@"uri"];
     NSString* quality = [arguments objectForKey:@"quality"];
     CGSize frameSize = CGSizeMake([[arguments objectForKey:@"width"] floatValue], [[arguments objectForKey:@"height"] floatValue]);
+    NSString* fileName = [arguments objectForKey:@"fileName"];
 
     //Get the image from the path
     NSURL* imageURL = [NSURL URLWithString:imageUrlString];
@@ -65,9 +66,12 @@
     // generate unique file name
     NSString* filePath;
     NSData* data = UIImageJPEGRepresentation(newImage, [quality floatValue] / 100.0f);
-    int i = 1;
     do {
-        filePath = [NSString stringWithFormat:@"%@/%@%03d.%@", docsPath, PROTONET_PHOTO_PREFIX, i++, @"jpg"];
+        if (!fileName) {
+            NSString *uuid = [[NSUUID UUID] UUIDString];
+            fileName = [NSString stringWithFormat:@"%@%@.%@", PROTONET_PHOTO_PREFIX, uuid, @"jpg"];
+        }
+        filePath = [NSString stringWithFormat:@"%@/%@", docsPath, fileName];
     } while ([fileMgr fileExistsAtPath:filePath]);
 
     // save file
