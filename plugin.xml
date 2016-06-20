@@ -39,4 +39,10 @@
 
     <framework src="MobileCoreServices.framework" />
   </platform>
+  
+  <platform name="windows">
+        <js-module src="src/windows/ImageResizerProxy.js" name="ImageResizerProxy">
+            <merges target="" />
+        </js-module>
+  </platform>
 </plugin>
