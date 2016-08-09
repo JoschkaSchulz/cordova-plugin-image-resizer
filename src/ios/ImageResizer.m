@@ -19,68 +19,35 @@
     //Get the image from the path
     NSURL* imageURL = [NSURL URLWithString:imageUrlString];
     UIImage* sourceImage = [UIImage imageWithData: [NSData dataWithContentsOfURL: imageURL]];
-    UIImage* newImage = nil;
-    CGSize imageSize = sourceImage.size;
-    CGFloat width = imageSize.width;
-    CGFloat height = imageSize.height;
-    CGFloat targetWidth = frameSize.width;
-    CGFloat targetHeight = frameSize.height;
-    CGFloat scaleFactor = 0.0;
-    CGSize scaledSize = frameSize;
+    UIImage *tempImage = nil;
+    CGSize targetSize = frameSize;
+    UIGraphicsBeginImageContext(targetSize);
 
-    // calculate the aspect ratio if the image is to large
-    if (CGSizeEqualToSize(imageSize, frameSize) == NO) {
-        CGFloat widthFactor = targetWidth / width;
-        CGFloat heightFactor = targetHeight / height;
+    CGRect thumbnailRect = CGRectMake(0, 0, 0, 0);
+    thumbnailRect.origin = CGPointMake(0.0,0.0);
+    thumbnailRect.size.width  = targetSize.width;
+    thumbnailRect.size.height = targetSize.height;
 
-        // opposite comparison to imageByScalingAndCroppingForSize in order to contain the image within the given bounds
-        if (widthFactor > heightFactor) {
-            scaleFactor = heightFactor; // scale to fit height
-        } else {
-            scaleFactor = widthFactor; // scale to fit width
-        }
-        scaledSize = CGSizeMake(MIN(width * scaleFactor, targetWidth), MIN(height * scaleFactor, targetHeight));
-    }
+    [sourceImage drawInRect:thumbnailRect];
 
-    // If the pixels are floats, it causes a white line in iOS8 and probably other versions too
-    scaledSize.width = (int)scaledSize.width;
-    scaledSize.height = (int)scaledSize.height;
+    tempImage = UIGraphicsGetImageFromCurrentImageContext();
 
-    UIGraphicsBeginImageContext(scaledSize); // this will resize
-
-    [sourceImage drawInRect:CGRectMake(0, 0, scaledSize.width, scaledSize.height)];
-
-    newImage = UIGraphicsGetImageFromCurrentImageContext();
-    if (newImage == nil) {
-        NSLog(@"could not scale image");
-    }
-
-    // pop the context to get back to the default
     UIGraphicsEndImageContext();
-
-    // get the temp directory path
-    NSString* docsPath = [NSTemporaryDirectory()stringByStandardizingPath];
-    NSError* err = nil;
-    NSFileManager* fileMgr = [[NSFileManager alloc] init];
-
-    // generate unique file name
-    NSString* filePath;
-    NSData* data = UIImageJPEGRepresentation(newImage, [quality floatValue] / 100.0f);
-    do {
-        if (!fileName) {
-            NSString *uuid = [[NSUUID UUID] UUIDString];
-            fileName = [NSString stringWithFormat:@"%@%@.%@", PROTONET_PHOTO_PREFIX, uuid, @"jpg"];
-        }
-        filePath = [NSString stringWithFormat:@"%@/%@", docsPath, fileName];
-    } while ([fileMgr fileExistsAtPath:filePath]);
-
-    // save file
+    NSData *imageData = UIImageJPEGRepresentation(tempImage, 0.1);
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *imagePath =[documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"img%f.jpeg",[[NSDate date]  timeIntervalSince1970]]];
     CDVPluginResult* result = nil;
-    if (![data writeToFile:filePath options:NSAtomicWrite error:&err]) {
-        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_IO_EXCEPTION messageAsString:[err localizedDescription]];
-    } else {
-        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[[NSURL fileURLWithPath:filePath] absoluteString]];
+
+    if (![imageData writeToFile:imagePath atomically:NO])
+    {
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_IO_EXCEPTION messageAsString:@"error save image"];
     }
+    else
+    {
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[[NSURL fileURLWithPath:imagePath] absoluteString]];
+    }
+
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
