@@ -36,7 +36,7 @@
     NSData *imageData = UIImageJPEGRepresentation(tempImage, 0.1);
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSString *imagePath =[documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"img%ld.jpeg",(NSInteger)[[NSDate date]  timeIntervalSince1970]]];
+    NSString *imagePath =[documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"img%ld.jpg",(NSInteger)[[NSDate date]  timeIntervalSince1970]]];
     CDVPluginResult* result = nil;
 
     if (![imageData writeToFile:imagePath atomically:NO])
