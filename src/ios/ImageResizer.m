@@ -5,14 +5,13 @@
 
 #define PROTONET_PHOTO_PREFIX @"protonet_"
 
-static int count = 0;
+static NSInteger count = 0;
 
 @implementation ImageResizer
-{
-    UIImage* sourceImage;
-}
+
 - (void) resize:(CDVInvokedUrlCommand*)command
 {
+    UIImage* sourceImage;
 
     __block PHImageRequestOptions * imageRequestOptions = [[PHImageRequestOptions alloc] init];
 
