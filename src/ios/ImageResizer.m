@@ -7,12 +7,12 @@
 
 static NSInteger count = 0;
 
-@implementation ImageResizer
+@implementation ImageResizer {
+    UIImage* sourceImage;
+}
 
 - (void) resize:(CDVInvokedUrlCommand*)command
 {
-    UIImage* sourceImage;
-
     __block PHImageRequestOptions * imageRequestOptions = [[PHImageRequestOptions alloc] init];
 
     imageRequestOptions.synchronous = YES;
