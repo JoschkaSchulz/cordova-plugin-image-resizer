@@ -5,82 +5,83 @@
 
 #define PROTONET_PHOTO_PREFIX @"protonet_"
 
-@implementation ImageResizer
+static NSInteger count = 0;
+
+@implementation ImageResizer {
+    UIImage* sourceImage;
+}
 
 - (void) resize:(CDVInvokedUrlCommand*)command
 {
+    __block PHImageRequestOptions * imageRequestOptions = [[PHImageRequestOptions alloc] init];
+
+    imageRequestOptions.synchronous = YES;
+
+    NSLog(@"IMAGE RESIZER START ----------------------------------------------------------------------------");
+
     // get the arguments and the stuff inside of it
     NSDictionary* arguments = [command.arguments objectAtIndex:0];
     NSString* imageUrlString = [arguments objectForKey:@"uri"];
+    NSLog(@"Image Resizer Image URL : %@",imageUrlString);
+
     NSString* quality = [arguments objectForKey:@"quality"];
     CGSize frameSize = CGSizeMake([[arguments objectForKey:@"width"] floatValue], [[arguments objectForKey:@"height"] floatValue]);
     NSString* fileName = [arguments objectForKey:@"fileName"];
 
-    //Get the image from the path
+    //    //Get the image from the path
     NSURL* imageURL = [NSURL URLWithString:imageUrlString];
-    UIImage* sourceImage = [UIImage imageWithData: [NSData dataWithContentsOfURL: imageURL]];
-    UIImage* newImage = nil;
-    CGSize imageSize = sourceImage.size;
-    CGFloat width = imageSize.width;
-    CGFloat height = imageSize.height;
-    CGFloat targetWidth = frameSize.width;
-    CGFloat targetHeight = frameSize.height;
-    CGFloat scaleFactor = 0.0;
-    CGSize scaledSize = frameSize;
 
-    // calculate the aspect ratio if the image is to large
-    if (CGSizeEqualToSize(imageSize, frameSize) == NO) {
-        CGFloat widthFactor = targetWidth / width;
-        CGFloat heightFactor = targetHeight / height;
+    sourceImage = [UIImage imageWithData: [NSData dataWithContentsOfURL: imageURL]];
 
-        // opposite comparison to imageByScalingAndCroppingForSize in order to contain the image within the given bounds
-        if (widthFactor > heightFactor) {
-            scaleFactor = heightFactor; // scale to fit height
-        } else {
-            scaleFactor = widthFactor; // scale to fit width
-        }
-        scaledSize = CGSizeMake(MIN(width * scaleFactor, targetWidth), MIN(height * scaleFactor, targetHeight));
-    }
+    PHFetchResult *savedAssets = [PHAsset fetchAssetsWithLocalIdentifiers:@[fileName] options:nil];
+    [savedAssets enumerateObjectsUsingBlock:^(PHAsset *asset, NSUInteger idx, BOOL *stop) {
+        //this gets called for every asset from its localIdentifier you saved
 
-    // If the pixels are floats, it causes a white line in iOS8 and probably other versions too
-    scaledSize.width = (int)scaledSize.width;
-    scaledSize.height = (int)scaledSize.height;
+        [[PHImageManager defaultManager]
+         requestImageDataForAsset:asset
+         options:imageRequestOptions
+         resultHandler:^(NSData *imageData, NSString *dataUTI,
+                         UIImageOrientation orientation,
+                         NSDictionary *info)
+         {
+             sourceImage  = [UIImage imageWithData:imageData];
+         }];
 
-    UIGraphicsBeginImageContext(scaledSize); // this will resize
+    }];
 
-    [sourceImage drawInRect:CGRectMake(0, 0, scaledSize.width, scaledSize.height)];
+    NSLog(@"image resizer:%@",  (sourceImage  ? @"image exsist" : @"null" ));
 
-    newImage = UIGraphicsGetImageFromCurrentImageContext();
-    if (newImage == nil) {
-        NSLog(@"could not scale image");
-    }
+    UIImage *tempImage = nil;
+    CGSize targetSize = frameSize;
+    UIGraphicsBeginImageContext(targetSize);
 
-    // pop the context to get back to the default
+    CGRect thumbnailRect = CGRectMake(0, 0, 0, 0);
+    thumbnailRect.origin = CGPointMake(0.0,0.0);
+    thumbnailRect.size.width  = targetSize.width;
+    thumbnailRect.size.height = targetSize.height;
+
+    [sourceImage drawInRect:thumbnailRect];
+
+    tempImage = UIGraphicsGetImageFromCurrentImageContext();
+    NSLog(@"image resizer:%@",  (tempImage  ? @"image exsist" : @"null" ));
+
     UIGraphicsEndImageContext();
-
-    // get the temp directory path
-    NSString* docsPath = [NSTemporaryDirectory()stringByStandardizingPath];
-    NSError* err = nil;
-    NSFileManager* fileMgr = [[NSFileManager alloc] init];
-
-    // generate unique file name
-    NSString* filePath;
-    NSData* data = UIImageJPEGRepresentation(newImage, [quality floatValue] / 100.0f);
-    do {
-        if (!fileName) {
-            NSString *uuid = [[NSUUID UUID] UUIDString];
-            fileName = [NSString stringWithFormat:@"%@%@.%@", PROTONET_PHOTO_PREFIX, uuid, @"jpg"];
-        }
-        filePath = [NSString stringWithFormat:@"%@/%@", docsPath, fileName];
-    } while ([fileMgr fileExistsAtPath:filePath]);
-
-    // save file
+    NSData *imageData = UIImageJPEGRepresentation(tempImage, [quality floatValue] / 100.0f );
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *imagePath =[documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"img%d.jpeg",count]];
+    count++;
     CDVPluginResult* result = nil;
-    if (![data writeToFile:filePath options:NSAtomicWrite error:&err]) {
-        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_IO_EXCEPTION messageAsString:[err localizedDescription]];
-    } else {
-        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[[NSURL fileURLWithPath:filePath] absoluteString]];
+
+    if (![imageData writeToFile:imagePath atomically:NO])
+    {
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_IO_EXCEPTION messageAsString:@"error save image"];
     }
+    else
+    {
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[[NSURL fileURLWithPath:imagePath] absoluteString]];
+    }
+
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
