@@ -56,7 +56,7 @@
 
                     var fileContent = canvas.toDataURL(file.contentType).split(',')[1];
 
-                    var storageFolder = getAppData().localFolder;
+                    var storageFolder = getAppData().localCacheFolder;
 
                     storageFolder.createFileAsync(tempPhotoFileName, OptUnique)
                         .then(function (storagefile) {
