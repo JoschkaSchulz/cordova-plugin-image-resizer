@@ -49,17 +49,38 @@ static NSInteger count = 0;
 
     }];
 
-    NSLog(@"image resizer:%@",  (sourceImage  ? @"image exsist" : @"null" ));
-
+    NSLog(@"image resizer:%@",  (sourceImage  ? @"image exists" : @"null" ));
+    
     UIImage *tempImage = nil;
     CGSize targetSize = frameSize;
-    UIGraphicsBeginImageContext(targetSize);
-
+    
     CGRect thumbnailRect = CGRectMake(0, 0, 0, 0);
     thumbnailRect.origin = CGPointMake(0.0,0.0);
-    thumbnailRect.size.width  = targetSize.width;
-    thumbnailRect.size.height = targetSize.height;
 
+    // get original image dimensions
+    CGFloat heightInPoints = sourceImage.size.height;
+    CGFloat heightInPixels = heightInPoints * sourceImage.scale;
+    CGFloat widthInPoints = sourceImage.size.width;
+    CGFloat widthInPixels = widthInPoints * sourceImage.scale;
+    
+    // calculate the target dimensions in a way that preserves the original aspect ratio
+    CGFloat newWidth = targetSize.width;
+    CGFloat newHeight = targetSize.height;
+    
+    if (heightInPixels > widthInPixels) {
+        // vertical image: use targetSize.height as reference for scaling
+        newWidth = widthInPixels * newHeight / heightInPixels;
+    } else {
+        // horizontal image: use targetSize.width as reference
+        newHeight = heightInPixels * newWidth / widthInPixels;
+    }
+    
+    thumbnailRect.size.width  = newWidth;
+    thumbnailRect.size.height = newHeight;
+    targetSize.width = newWidth;
+    targetSize.height = newHeight;
+    
+    UIGraphicsBeginImageContext(targetSize);
     [sourceImage drawInRect:thumbnailRect];
 
     tempImage = UIGraphicsGetImageFromCurrentImageContext();

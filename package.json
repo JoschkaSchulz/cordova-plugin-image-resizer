@@ -1,0 +1,33 @@
+{
+  "name": "cordova-plugin-image-resizer",
+  "version": "0.1.1",
+  "description": "Plugin for resizing images only with the uri of the image.",
+  "cordova": {
+    "id": "info.protonet.imageresizer",
+    "platforms": [
+      "ios",
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JoschkaSchulz/cordova-plugin-image-resizer"
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-ios",
+    "cordova-android"
+  ],
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=3.5.0"
+    }
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JoschkaSchulz/cordova-plugin-image-resizer/issues"
+  },
+  "homepage": "https://github.com/JoschkaSchulz/cordova-plugin-image-resizer#readme"
+}
