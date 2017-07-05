@@ -88,9 +88,14 @@ static NSInteger count = 0;
 
     UIGraphicsEndImageContext();
     NSData *imageData = UIImageJPEGRepresentation(tempImage, [quality floatValue] / 100.0f );
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSString *imagePath =[documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"img%d.jpeg",count]];
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    NSString *cachesDirectory = [paths objectAtIndex:0];
+    BOOL isDir = NO;
+    NSError *error;
+    if (! [[NSFileManager defaultManager] fileExistsAtPath:cachesDirectory isDirectory:&isDir] && isDir == NO) {
+        [[NSFileManager defaultManager] createDirectoryAtPath:cachesDirectory withIntermediateDirectories:NO attributes:nil error:&error];
+    }
+    NSString *imagePath =[cachesDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"img%d.jpeg",count]];
     count++;
     CDVPluginResult* result = nil;
 
