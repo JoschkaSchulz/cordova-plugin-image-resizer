@@ -56,8 +56,6 @@
 
                     var fileContent = canvas.toDataURL(file.contentType).split(',')[1];
 
-                    var storageFolder = getAppData().localCacheFolder;
-
                     storageFolder.createFileAsync(tempPhotoFileName, OptUnique)
                         .then(function (storagefile) {
                             var content = Windows.Security.Cryptography.CryptographicBuffer.decodeFromBase64String(fileContent);
