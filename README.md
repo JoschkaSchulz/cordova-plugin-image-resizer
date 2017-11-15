@@ -1,4 +1,4 @@
-# Image Resizer for Cordova #
+        # Image Resizer for Cordova #
 By: Protonet GmbH
 
 Authors: Joschka Schulz
@@ -24,6 +24,7 @@ At the moment the plugin is available on android, iOS and windows
   - **quality**(Number): Quality given as Number for the quality of the new image **android and iOS only**
   - **width**(Number): The width of the new image,
   - **height**(Number): The height of the new image
+  - **base64**(Boolean): Whether or not to return a base64 encoded image string instead of the path to the resized image **iOS only**
 
 ### Android Example
     var options = {
@@ -31,7 +32,8 @@ At the moment the plugin is available on android, iOS and windows
           folderName: "Protonet Messenger",
           quality: 90,
           width: 1280,
-          height: 1280};
+          height: 1280,
+          base64: true};
 
     window.ImageResizer.resize(options,
       function(image) {
