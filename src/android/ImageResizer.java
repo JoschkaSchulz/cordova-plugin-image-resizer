@@ -32,6 +32,7 @@ public class ImageResizer extends CordovaPlugin {
     private int width;
     private int height;
     private boolean base64 = false;
+    private boolean fit = false;
 
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         try {
@@ -60,6 +61,7 @@ public class ImageResizer extends CordovaPlugin {
                 width = jsonObject.getInt("width");
                 height = jsonObject.getInt("height");
                 base64 = jsonObject.optBoolean("base64", false);
+                fit = jsonObject.optBoolean("fit", false);
 
                 Bitmap bitmap;
                 // load the image from uri
@@ -67,7 +69,7 @@ public class ImageResizer extends CordovaPlugin {
                     bitmap = loadScaledBitmapFromUri(uri, width, height);
 
                 } else {
-                    bitmap = this.loadBase64BitmapFromUri(uri, width, height);
+                    bitmap = this.loadBase64ScaledBitmapFromUri(uri, width, height, fit);
                 }
 
 
@@ -95,14 +97,16 @@ public class ImageResizer extends CordovaPlugin {
     }
 
     public String getStringImage(Bitmap bmp, int quality) {
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bmp.compress(Bitmap.CompressFormat.JPEG, quality, baos);
         byte[] imageBytes = baos.toByteArray();
-        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+
+        String encodedImage = Base64.encodeToString(imageBytes, Base64.NO_WRAP);
         return encodedImage;
     }
 
-    private Bitmap loadBase64BitmapFromUri(String uriString, int width, int height) {
+    private Bitmap loadBase64ScaledBitmapFromUri(String uriString, int width, int height, boolean fit) {
         try {
 
             final String pureBase64Encoded = uriString.substring(uriString.indexOf(",") + 1);
@@ -110,7 +114,21 @@ public class ImageResizer extends CordovaPlugin {
 
             Bitmap decodedBitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
 
-            Bitmap scaled =  Bitmap.createScaledBitmap(decodedBitmap, width, height, true);
+            int sourceWidth = decodedBitmap.getWidth();
+            int sourceHeight = decodedBitmap.getHeight();
+
+            float ratio = sourceWidth > sourceHeight ? ((float) width / sourceWidth) : ((float) height / sourceHeight);
+
+            int execWidth = width;
+            int execHeigth = height;
+
+            if (fit) {
+                execWidth = Math.round(ratio * sourceWidth);
+                execHeigth = Math.round(ratio * sourceHeight);
+            }
+
+
+            Bitmap scaled = Bitmap.createScaledBitmap(decodedBitmap, execWidth, execHeigth, true);
 
             return scaled;
 
