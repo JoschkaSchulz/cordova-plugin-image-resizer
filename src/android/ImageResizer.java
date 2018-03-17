@@ -1,11 +1,12 @@
 package info.protonet.imageresizer;
 
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
+import android.util.Base64;
 import android.util.Log;
+
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
@@ -14,6 +15,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -29,10 +31,13 @@ public class ImageResizer extends CordovaPlugin {
     private int quality;
     private int width;
     private int height;
+    private boolean base64 = false;
 
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         try {
             this.callbackContext = callbackContext;
+
+            boolean isFileUri = false;
 
             if (action.equals("resize")) {
                 checkParameters(args);
@@ -40,6 +45,9 @@ public class ImageResizer extends CordovaPlugin {
                 // get the arguments
                 JSONObject jsonObject = args.getJSONObject(0);
                 uri = jsonObject.getString("uri");
+
+                isFileUri = !uri.startsWith("data") ? true : false;
+
                 folderName = null;
                 if (jsonObject.has("folderName")) {
                     folderName = jsonObject.getString("folderName");
@@ -48,17 +56,32 @@ public class ImageResizer extends CordovaPlugin {
                 if (jsonObject.has("fileName")) {
                     fileName = jsonObject.getString("fileName");
                 }
-                quality = jsonObject.getInt("quality");
+                quality = jsonObject.optInt("quality", 85);
                 width = jsonObject.getInt("width");
                 height = jsonObject.getInt("height");
+                base64 = jsonObject.optBoolean("base64", false);
 
+                Bitmap bitmap;
                 // load the image from uri
-                Bitmap bitmap = loadScaledBitmapFromUri(uri, width, height);
+                if (isFileUri) {
+                    bitmap = loadScaledBitmapFromUri(uri, width, height);
+
+                } else {
+                    bitmap = this.loadBase64BitmapFromUri(uri, width, height);
+                }
+
+
+                String response;
 
                 // save the image as jpeg on the device
-                Uri scaledFile = saveFile(bitmap);
+                if (!base64) {
+                    Uri scaledFile = saveFile(bitmap);
+                    response = scaledFile.toString();
+                } else {
+                    response = this.getStringImage(bitmap, quality);
+                }
 
-                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, scaledFile.toString()));
+                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, response));
                 return true;
             } else {
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR));
@@ -69,6 +92,32 @@ public class ImageResizer extends CordovaPlugin {
         }
         callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR));
         return false;
+    }
+
+    public String getStringImage(Bitmap bmp, int quality) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, quality, baos);
+        byte[] imageBytes = baos.toByteArray();
+        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        return encodedImage;
+    }
+
+    private Bitmap loadBase64BitmapFromUri(String uriString, int width, int height) {
+        try {
+
+            final String pureBase64Encoded = uriString.substring(uriString.indexOf(",") + 1);
+            final byte[] decodedBytes = Base64.decode(pureBase64Encoded, Base64.DEFAULT);
+
+            Bitmap decodedBitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+
+            Bitmap scaled =  Bitmap.createScaledBitmap(decodedBitmap, width, height, true);
+
+            return scaled;
+
+        } catch (Exception e) {
+            Log.e("Protonet", e.toString());
+        }
+        return null;
     }
 
     /**
