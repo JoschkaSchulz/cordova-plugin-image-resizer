@@ -83,6 +83,8 @@ public class ImageResizer extends CordovaPlugin {
                     response = this.getStringImage(bitmap, quality);
                 }
 
+                bitmap = null;
+
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, response));
                 return true;
             } else {
@@ -109,8 +111,8 @@ public class ImageResizer extends CordovaPlugin {
     private Bitmap loadBase64ScaledBitmapFromUri(String uriString, int width, int height, boolean fit) {
         try {
 
-            final String pureBase64Encoded = uriString.substring(uriString.indexOf(",") + 1);
-            final byte[] decodedBytes = Base64.decode(pureBase64Encoded, Base64.DEFAULT);
+            String pureBase64Encoded = uriString.substring(uriString.indexOf(",") + 1);
+            byte[] decodedBytes = Base64.decode(pureBase64Encoded, Base64.DEFAULT);
 
             Bitmap decodedBitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
 
@@ -127,8 +129,10 @@ public class ImageResizer extends CordovaPlugin {
                 execHeigth = Math.round(ratio * sourceHeight);
             }
 
-
             Bitmap scaled = Bitmap.createScaledBitmap(decodedBitmap, execWidth, execHeigth, true);
+
+            decodedBytes = null;
+            decodedBitmap = null;
 
             return scaled;
 
