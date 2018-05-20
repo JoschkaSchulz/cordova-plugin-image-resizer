@@ -7,6 +7,7 @@ import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
+import android.util.Base64;
 import android.util.Log;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -16,6 +17,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -32,6 +34,7 @@ public class ImageResizer extends CordovaPlugin {
     private int width;
     private int height;
     private boolean fixRotation = false;
+    private boolean base64 = false;
 
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         try {
@@ -57,11 +60,22 @@ public class ImageResizer extends CordovaPlugin {
                 if(jsonObject.has("fixRotation")){
                   fixRotation = jsonObject.getBoolean("fixRotation");
                 }
+                if(jsonObject.has("base64")){
+                  base64 = jsonObject.getBoolean("base64");
+                }
 
                 // load the image from uri
                 Bitmap bitmap = loadScaledBitmapFromUri(uri, width, height);
 
+                if(bitmap == null){
+                  Log.e("Protonet", "There was an error reading the image");
+                  callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR));
+                  return false;
+                }
+
                 if(fixRotation){
+                  // Get the exif rotation in degrees, create a transformation matrix, and rotate
+                  // the bitmap
                   int rotation = getRoationDegrees(getRotation(uri));
                   Matrix matrix = new Matrix();
                   if (rotation != 0f) {matrix.preRotate(rotation);}
@@ -75,10 +89,26 @@ public class ImageResizer extends CordovaPlugin {
                     true);
                 }
 
-              // save the image as jpeg on the device
-                Uri scaledFile = saveFile(bitmap);
+                if(base64){
+                  // convert the bitmap to a b64 string and return
+                  ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                  bitmap.compress(CompressFormat.JPEG, 100, byteArrayOutputStream);
+                  byte[] byteArray = byteArrayOutputStream .toByteArray();
+                  String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
+                  callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK,
+                    "data:image/jpeg;base64,"+encoded));
+                }else {
+                  // save the image as jpeg on the device
+                  Uri scaledFile = saveFile(bitmap);
 
-                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, scaledFile.toString()));
+                  if(scaledFile == null){
+                    Log.e("Protonet", "There was an error saving the thumbnail");
+                    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR));
+                    return false;
+                  }
+                  callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK,
+                    scaledFile.toString()));
+                }
                 return true;
             } else {
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR));
