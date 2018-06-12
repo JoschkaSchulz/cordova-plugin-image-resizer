@@ -1,0 +1,76 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "/Users/joschkaschulz/Projects/cordova-plugin-image-resizer",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "/Users/joschkaschulz/Projects/cordova-plugin-image-resizer",
+        "spec": "/Users/joschkaschulz/Projects/cordova-plugin-image-resizer",
+        "type": "directory"
+      },
+      "/Users/joschkaschulz/Projects/cordova-plugin-image-resizer/test"
+    ]
+  ],
+  "_from": "..",
+  "_id": "cordova-plugin-image-resizer@0.1.1",
+  "_inCache": true,
+  "_location": "/cordova-plugin-image-resizer",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "/Users/joschkaschulz/Projects/cordova-plugin-image-resizer",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "/Users/joschkaschulz/Projects/cordova-plugin-image-resizer",
+    "spec": "/Users/joschkaschulz/Projects/cordova-plugin-image-resizer",
+    "type": "directory"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "file:..",
+  "_shasum": "50b25e784cdc29c7fadc700fc3f157821cdccc32",
+  "_shrinkwrap": null,
+  "_spec": "/Users/joschkaschulz/Projects/cordova-plugin-image-resizer",
+  "_where": "/Users/joschkaschulz/Projects/cordova-plugin-image-resizer/test",
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/JoschkaSchulz/cordova-plugin-image-resizer/issues"
+  },
+  "cordova": {
+    "id": "cordova-plugin-image-resizer",
+    "platforms": [
+      "ios",
+      "android"
+    ]
+  },
+  "dependencies": {},
+  "description": "Plugin for resizing images only with the uri of the image.",
+  "devDependencies": {},
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=3.5.0"
+    }
+  ],
+  "gitHead": "fe27fffe2f6d75977fc80171abe2641929c42643",
+  "homepage": "https://github.com/JoschkaSchulz/cordova-plugin-image-resizer#readme",
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-ios",
+    "cordova-android"
+  ],
+  "license": "MIT",
+  "name": "cordova-plugin-image-resizer",
+  "optionalDependencies": {},
+  "readme": "        # Image Resizer for Cordova #\nBy: Protonet GmbH\n\nAuthors: Joschka Schulz\n\n## Adding the Plugin ##\n\nUse the Cordova CLI and type in the following command:\n\n`cordova plugin add https://github.com/protonet/cordova-plugin-image-resizer.git`\n\n## Sample Code\n\nAt the moment the plugin is available on android, iOS and windows\n\n### resize\n\n    window.ImageResizer.resize(options, success, failed);\n\n### Options\n  - **uri**(String): The Uri for the image on the device to get scaled\n  - **folderName**(String): The name of the folder the image should be put in **android only**\n  - **fileName**(String): A custom name for the file. Default name is a timestamp. **android and windows only**\n  - **quality**(Number): Quality given as Number for the quality of the new image **android and iOS only**\n  - **width**(Number): The width of the new image,\n  - **height**(Number): The height of the new image\n  - **base64**(Boolean): Whether or not to return a base64 encoded image string instead of the path to the resized image **iOS only**\n\n### Android Example\n    var options = {\n          uri: uri,\n          folderName: \"Protonet Messenger\",\n          quality: 90,\n          width: 1280,\n          height: 1280,\n          base64: true};\n\n    window.ImageResizer.resize(options,\n      function(image) {\n         // success: image is the new resized image\n      }, function() {\n        // failed: grumpy cat likes this function\n      });\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JoschkaSchulz/cordova-plugin-image-resizer.git"
+  },
+  "version": "0.1.1"
+}

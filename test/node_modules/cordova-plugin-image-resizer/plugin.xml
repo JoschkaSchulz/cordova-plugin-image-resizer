@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        id="cordova-plugin-image-resizer" version="0.1.1">
+  <name>Image Resizer</name>
+  <description>Plugin for resizing images only with the uri of the image.</description>
+  <author>Joschka Schulz</author>
+  <license>Apache 2.0</license>
+  <keywords>cordova,device,resize,image</keywords>
+  <repo>https://github.com/protonet/cordova-plugin-image-resizer.git</repo>
+
+  <js-module src="www/image_resizer.js" name="ImageResizer">
+    <clobbers target="ImageResizer" />
+  </js-module>
+
+  <!-- android -->
+  <platform name="android">
+    <config-file target="res/xml/config.xml" parent="/*">
+      <feature name="ImageResizer">
+        <param name="android-package" value="info.protonet.imageresizer.ImageResizer"/>
+      </feature>
+    </config-file>
+    <config-file target="AndroidManifest.xml" parent="/*">
+      <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    </config-file>
+
+    <source-file src="src/android/ImageResizer.java" target-dir="src/info/protonet/imageresizer" />
+	<preference name="ANDROID_EXIFINTERFACES_VERSION" default="27.+"/>
+	<framework src="com.android.support:exifinterface:$ANDROID_EXIFINTERFACES_VERSION"/>
+  </platform>
+
+  <platform name="ios">
+    <config-file parent="/*" target="config.xml">
+        <feature name="ImageResizer">
+            <param name="ios-package" value="ImageResizer" />
+        </feature>
+    </config-file>
+
+    <header-file src="src/ios/ImageResizer.h" />
+    <source-file src="src/ios/ImageResizer.m" />
+
+    <framework src="MobileCoreServices.framework" />
+  </platform>
+  
+  <platform name="windows">
+        <js-module src="src/windows/ImageResizerProxy.js" name="ImageResizerProxy">
+            <merges target="" />
+        </js-module>
+  </platform>
+</plugin>
