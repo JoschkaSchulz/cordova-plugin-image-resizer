@@ -7,7 +7,13 @@ Authors: Joschka Schulz
 
 Use the Cordova CLI and type in the following command:
 
-`cordova plugin add https://github.com/protonet/cordova-plugin-image-resizer.git`
+```
+// This plugin uses the cordova-plugin-camera
+cordova plugin add cordova-plugin-camera
+
+// This plugin
+cordova plugin add https://github.com/protonet/cordova-plugin-image-resizer.git
+```
 
 ## Sample Code
 
