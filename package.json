@@ -3,7 +3,7 @@
   "version": "0.1.1",
   "description": "Plugin for resizing images only with the uri of the image.",
   "cordova": {
-    "id": "info.protonet.imageresizer",
+    "id": "cordova-plugin-image-resizer",
     "platforms": [
       "ios",
       "android"
