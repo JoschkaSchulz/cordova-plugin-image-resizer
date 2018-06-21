@@ -29,32 +29,12 @@ static NSInteger count = 0;
     NSString* fileName = [arguments objectForKey:@"fileName"];
 
     BOOL asBase64 = [[arguments objectForKey:@"base64"] boolValue];
-    BOOL fixRotation = [[arguments objectForKey:@"fixRotation"] boolValue];
 
     //    //Get the image from the path
     NSURL* imageURL = [NSURL URLWithString:imageUrlString];
 
     sourceImage = [UIImage imageWithData: [NSData dataWithContentsOfURL: imageURL]];
-    
-    int rotation = 0;
-    
-    switch ([sourceImage imageOrientation]) {
-        case UIImageOrientationUp:
-            rotation = 0;
-            break;
-        case UIImageOrientationDown:
-            rotation = 180;
-            break;
-        case UIImageOrientationLeft:
-            rotation = 270;
-            break;
-        case UIImageOrientationRight:
-            rotation = 90;
-            break;
-        default:
-            break;
-    }
-    
+
     PHFetchResult *savedAssets = [PHAsset fetchAssetsWithLocalIdentifiers:@[fileName] options:nil];
     [savedAssets enumerateObjectsUsingBlock:^(PHAsset *asset, NSUInteger idx, BOOL *stop) {
         //this gets called for every asset from its localIdentifier you saved
@@ -107,10 +87,6 @@ static NSInteger count = 0;
 
     tempImage = UIGraphicsGetImageFromCurrentImageContext();
     NSLog(@"image resizer:%@",  (tempImage  ? @"image exsist" : @"null" ));
-    
-    if(fixRotation){
-        tempImage = [self rotateImage:tempImage withRotation:rotation];
-    }
 
     UIGraphicsEndImageContext();
     NSData *imageData = UIImageJPEGRepresentation(tempImage, [quality floatValue] / 100.0f );
@@ -141,28 +117,6 @@ static NSInteger count = 0;
     }
 
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
-}
-
-- (UIImage*) rotateImage:(UIImage*) image withRotation:(int) rotation{
-    CGFloat rot = rotation * M_PI / 180;
-    
-    // Calculate Destination Size
-    CGAffineTransform t = CGAffineTransformMakeRotation(rot);
-    CGRect sizeRect = (CGRect) {.size = image.size};
-    CGRect destRect = CGRectApplyAffineTransform(sizeRect, t);
-    CGSize destinationSize = destRect.size;
-    
-    // Draw image
-    UIGraphicsBeginImageContext(destinationSize);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextTranslateCTM(context, destinationSize.width / 2.0f, destinationSize.height / 2.0f);
-    CGContextRotateCTM(context, rot);
-    [image drawInRect:CGRectMake(-image.size.width / 2.0f, -image.size.height / 2.0f, image.size.width, image.size.height)];
-    
-    // Save image
-    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return newImage;
 }
 
 @end
