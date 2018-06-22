@@ -1,9 +1,9 @@
 {
-  "name": "cordova-plugin-simple-image-resizer",
-  "version": "0.2.0",
+  "name": "cordova-plugin-image-resizer",
+  "version": "0.1.1",
   "description": "Plugin for resizing images only with the uri of the image.",
   "cordova": {
-    "id": "cordova-plugin-simple-image-resizer",
+    "id": "cordova-plugin-image-resizer",
     "platforms": [
       "ios",
       "android"
