@@ -16,7 +16,7 @@ At the moment the plugin is available on android, iOS and windows
     window.ImageResizer.resize(options, success, failed);
 
 ### Options
-  - **uri**(String): The Uri for the image on the device to get scaled
+  - **uri**(String): The Uri for the image on the device to get scaled (can be file:// path or data:image base64 encoded string)
   - **folderName**(String): The name of the folder the image should be put in **android only**
   - **fileName**(String): A custom name for the file. Default name is a timestamp. **android and windows only**
   - **quality**(Number): Quality given as Number for the quality of the new image **android and iOS only**
