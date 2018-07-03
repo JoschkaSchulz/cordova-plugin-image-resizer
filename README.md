@@ -29,6 +29,7 @@ At the moment the plugin is available on android, iOS and windows
 ```
     var options = {
           uri: uri,
+          folderName: "Protonet Messenger",
           quality: 90,
           width: 1280,
           height: 1280,
