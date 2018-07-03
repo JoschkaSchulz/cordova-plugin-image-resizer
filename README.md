@@ -6,7 +6,14 @@ Authors: Joschka Schulz
 ## Adding the Plugin ##
 Use the Cordova CLI and type in the following command:
 `cordova plugin add https://github.com/kdcro101/cordova-plugin-image-resizer.git`
+```
 
+// This plugin uses the cordova-plugin-camera
+cordova plugin add cordova-plugin-camera
+
+// This plugin
+cordova plugin add https://github.com/protonet/cordova-plugin-image-resizer.git
+```
 ## Platforms
 
 At the moment the plugin is available on android, iOS and windows
@@ -14,8 +21,9 @@ At the moment the plugin is available on android, iOS and windows
 ### resize
 
     window.ImageResizer.resize(options, success, failed);
-
+    
 ### Options
+
   - **uri**(String): The Uri for the image on the device to get scaled (can be file:// path (iOS,Android) or data:image base64 encoded string(Android only))
   - **folderName**(String): The name of the folder the image should be put in **android only**
   - **fileName**(String): A custom name for the file. Default name is a timestamp. **android and windows only**

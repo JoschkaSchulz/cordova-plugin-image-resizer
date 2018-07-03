@@ -2,6 +2,8 @@ package info.protonet.imageresizer;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.Base64;
@@ -31,8 +33,11 @@ public class ImageResizer extends CordovaPlugin {
     private int quality;
     private int width;
     private int height;
+
     private boolean base64 = false;
     private boolean fit = false;
+    private boolean fixRotation = false;
+
 
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         try {
@@ -60,9 +65,11 @@ public class ImageResizer extends CordovaPlugin {
                 quality = jsonObject.optInt("quality", 85);
                 width = jsonObject.getInt("width");
                 height = jsonObject.getInt("height");
+
                 base64 = jsonObject.optBoolean("base64", false);
                 fit = jsonObject.optBoolean("fit", false);
-
+                fixRotation = jsonObject.optBoolean("fixRotation",false);
+                
                 Bitmap bitmap;
                 // load the image from uri
                 if (isFileUri) {
@@ -72,20 +79,44 @@ public class ImageResizer extends CordovaPlugin {
                     bitmap = this.loadBase64ScaledBitmapFromUri(uri, width, height, fit);
                 }
 
+                 if(fixRotation){
+                  // Get the exif rotation in degrees, create a transformation matrix, and rotate
+                  // the bitmap
+                  int rotation = getRoationDegrees(getRotation(uri));
+                  Matrix matrix = new Matrix();
+                  if (rotation != 0f) {matrix.preRotate(rotation);}
+                  bitmap = Bitmap.createBitmap(
+                    bitmap,
+                    0,
+                    0,
+                    bitmap.getWidth(),
+                    bitmap.getHeight(),
+                    matrix,
+                    true);
+                }
+
+                if(bitmap == null){
+                  Log.e("Protonet", "There was an error reading the image");
+                  callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR));
+                  return false;
+                }
+
 
                 String response;
 
+ 
                 // save the image as jpeg on the device
                 if (!base64) {
                     Uri scaledFile = saveFile(bitmap);
                     response = scaledFile.toString();
                 } else {
-                    response = this.getStringImage(bitmap, quality);
+                    response =  "data:image/jpeg;base64," + this.getStringImage(bitmap, quality);
                 }
 
                 bitmap = null;
 
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, response));
+ 
                 return true;
             } else {
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR));
@@ -140,6 +171,34 @@ public class ImageResizer extends CordovaPlugin {
             Log.e("Protonet", e.toString());
         }
         return null;
+    }
+
+    /**
+    * Gets the image rotation from the image EXIF Data
+    *
+    * @param exifOrientation ExifInterface.ORIENTATION_* representation of the rotation
+    * @return the rotation in degrees
+    */
+    private int getRoationDegrees(int exifOrientation){
+      if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) { return 90; }
+      else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {  return 180; }
+      else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {  return 270; }
+      return 0;
+    }
+
+    /**
+    * Gets the image rotation from the image EXIF Data
+    *
+    * @param uriString the URI of the image to get the rotation for
+    * @return ExifInterface.ORIENTATION_* representation of the rotation
+    */
+    private int getRotation(String uriString){
+      try {
+        ExifInterface exif = new ExifInterface(uriString);
+        return exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+      } catch (IOException e) {
+        return ExifInterface.ORIENTATION_NORMAL;
+      }
     }
 
     /**
