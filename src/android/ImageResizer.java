@@ -185,7 +185,8 @@ public class ImageResizer extends CordovaPlugin {
             if (folderName.contains("/")) {
                 folder = new File(folderName.replace("file://", ""));
             } else {
-                folder = new File(Environment.getExternalStorageDirectory() + "/" + folderName);
+                Context context = this.cordova.getActivity().getApplicationContext();
+                folder          = context.getDir(folderName, context.MODE_PRIVATE);
             }
         }
         boolean success = true;
