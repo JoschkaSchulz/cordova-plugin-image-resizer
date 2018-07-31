@@ -1,5 +1,6 @@
 package info.protonet.imageresizer;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
@@ -33,12 +34,17 @@ public class ImageResizer extends CordovaPlugin {
     private int quality;
     private int width;
     private int height;
-    private boolean fixRotation = false;
+
     private boolean base64 = false;
+    private boolean fit = false;
+    private boolean fixRotation = false;
+
 
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         try {
             this.callbackContext = callbackContext;
+
+            boolean isFileUri = false;
 
             if (action.equals("resize")) {
                 checkParameters(args);
@@ -46,6 +52,9 @@ public class ImageResizer extends CordovaPlugin {
                 // get the arguments
                 JSONObject jsonObject = args.getJSONObject(0);
                 uri = jsonObject.getString("uri");
+
+                isFileUri = !uri.startsWith("data") ? true : false;
+
                 folderName = null;
                 if (jsonObject.has("folderName")) {
                     folderName = jsonObject.getString("folderName");
@@ -54,61 +63,66 @@ public class ImageResizer extends CordovaPlugin {
                 if (jsonObject.has("fileName")) {
                     fileName = jsonObject.getString("fileName");
                 }
-                quality = jsonObject.getInt("quality");
+                quality = jsonObject.optInt("quality", 85);
                 width = jsonObject.getInt("width");
                 height = jsonObject.getInt("height");
-                if(jsonObject.has("fixRotation")){
-                  fixRotation = jsonObject.getBoolean("fixRotation");
-                }
-                if(jsonObject.has("base64")){
-                  base64 = jsonObject.getBoolean("base64");
-                }
 
+                base64 = jsonObject.optBoolean("base64", false);
+                fit = jsonObject.optBoolean("fit", false);
+                fixRotation = jsonObject.optBoolean("fixRotation",false);
+
+                Bitmap bitmap;
                 // load the image from uri
-                Bitmap bitmap = loadScaledBitmapFromUri(uri, width, height);
+                if (isFileUri) {
+                    bitmap = loadScaledBitmapFromUri(uri, width, height);
 
-                if(bitmap == null){
-                  Log.e("Protonet", "There was an error reading the image");
-                  callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR));
-                  return false;
+                } else {
+                    bitmap = this.loadBase64ScaledBitmapFromUri(uri, width, height, fit);
                 }
 
                 if(fixRotation){
-                  // Get the exif rotation in degrees, create a transformation matrix, and rotate
-                  // the bitmap
-                  int rotation = getRoationDegrees(getRotation(uri));
-                  Matrix matrix = new Matrix();
-                  if (rotation != 0f) {matrix.preRotate(rotation);}
-                  bitmap = Bitmap.createBitmap(
-                    bitmap,
-                    0,
-                    0,
-                    bitmap.getWidth(),
-                    bitmap.getHeight(),
-                    matrix,
-                    true);
+                    // Get the exif rotation in degrees, create a transformation matrix, and rotate
+                    // the bitmap
+                    int rotation = getRoationDegrees(getRotation(uri));
+                    Matrix matrix = new Matrix();
+                    if (rotation != 0f) {matrix.preRotate(rotation);}
+                    bitmap = Bitmap.createBitmap(
+                            bitmap,
+                            0,
+                            0,
+                            bitmap.getWidth(),
+                            bitmap.getHeight(),
+                            matrix,
+                            true);
                 }
 
-                if(base64){
-                  // convert the bitmap to a b64 string and return
-                  ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                  bitmap.compress(CompressFormat.JPEG, 100, byteArrayOutputStream);
-                  byte[] byteArray = byteArrayOutputStream .toByteArray();
-                  String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
-                  callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK,
-                    "data:image/jpeg;base64,"+encoded));
-                }else {
-                  // save the image as jpeg on the device
-                  Uri scaledFile = saveFile(bitmap);
-
-                  if(scaledFile == null){
-                    Log.e("Protonet", "There was an error saving the thumbnail");
+                if(bitmap == null){
+                    Log.e("Protonet", "There was an error reading the image");
                     callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR));
                     return false;
-                  }
-                  callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK,
-                    scaledFile.toString()));
                 }
+
+
+                String response;
+
+
+                // save the image as jpeg on the device
+                if (!base64) {
+                    Uri scaledFile = saveFile(bitmap);
+                    response = scaledFile.toString();
+                    if(scaledFile == null){
+                        Log.e("Protonet", "There was an error saving the thumbnail");
+                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR));
+                        return false;
+                    }
+                } else {
+                    response =  "data:image/jpeg;base64," + this.getStringImage(bitmap, quality);
+                }
+
+                bitmap = null;
+
+                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, response));
+
                 return true;
             } else {
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR));
@@ -120,7 +134,48 @@ public class ImageResizer extends CordovaPlugin {
         callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR));
         return false;
     }
+    public String getStringImage(Bitmap bmp, int quality) {
 
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, quality, baos);
+        byte[] imageBytes = baos.toByteArray();
+
+        String encodedImage = Base64.encodeToString(imageBytes, Base64.NO_WRAP);
+        return encodedImage;
+    }
+    private Bitmap loadBase64ScaledBitmapFromUri(String uriString, int width, int height, boolean fit) {
+        try {
+
+            String pureBase64Encoded = uriString.substring(uriString.indexOf(",") + 1);
+            byte[] decodedBytes = Base64.decode(pureBase64Encoded, Base64.DEFAULT);
+
+            Bitmap decodedBitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+
+            int sourceWidth = decodedBitmap.getWidth();
+            int sourceHeight = decodedBitmap.getHeight();
+
+            float ratio = sourceWidth > sourceHeight ? ((float) width / sourceWidth) : ((float) height / sourceHeight);
+
+            int execWidth = width;
+            int execHeigth = height;
+
+            if (fit) {
+                execWidth = Math.round(ratio * sourceWidth);
+                execHeigth = Math.round(ratio * sourceHeight);
+            }
+
+            Bitmap scaled = Bitmap.createScaledBitmap(decodedBitmap, execWidth, execHeigth, true);
+
+            decodedBytes = null;
+            decodedBitmap = null;
+
+            return scaled;
+
+        } catch (Exception e) {
+            Log.e("Protonet", e.toString());
+        }
+        return null;
+    }
     /**
     * Gets the image rotation from the image EXIF Data
     *
