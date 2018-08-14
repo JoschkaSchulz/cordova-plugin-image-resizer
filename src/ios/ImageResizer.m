@@ -30,10 +30,12 @@
     BOOL asBase64 = [[arguments objectForKey:@"base64"] boolValue];
     BOOL fixRotation = [[arguments objectForKey:@"fixRotation"] boolValue];
     
-    //    //Get the image from the path
-    NSURL* imageURL = [NSURL URLWithString:imageUrlString];
-    
-    sourceImage = [UIImage imageWithData: [NSData dataWithContentsOfURL: imageURL]];
+    // Check if the file is a local file, and if so, read with file manager to avoid NSUrl -1022 error
+    if ([[NSFileManager defaultManager] fileExistsAtPath:imageUrlString]){
+        sourceImage = [UIImage imageWithData: [[NSFileManager defaultManager] contentsAtPath:imageUrlString]];
+    }else {
+        sourceImage = [UIImage imageWithData: [NSData dataWithContentsOfURL: [NSURL URLWithString:imageUrlString]]];
+    }    
     
     int rotation = 0;
     
