@@ -25,8 +25,7 @@
     </config-file>
 
     <source-file src="src/android/ImageResizer.java" target-dir="src/info/protonet/imageresizer" />
-	<preference name="ANDROID_EXIFINTERFACES_VERSION" default="27.+"/>
-	<framework src="com.android.support:exifinterface:$ANDROID_EXIFINTERFACES_VERSION"/>
+	  <framework src="com.android.support:exifinterface:27.+"/>
   </platform>
 
   <platform name="ios">
