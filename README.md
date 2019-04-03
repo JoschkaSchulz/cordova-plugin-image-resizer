@@ -1,3 +1,6 @@
+# ATTENTION
+I don't have any time to maintain this plugin anymore. As long as no one wants to maintain it I don't see the possiblity to fix all the stuff mentioned in the issues, sorry. I recommend to not use this plugin anymore.
+
 # Image Resizer for Cordova #
 By: Protonet GmbH
 
