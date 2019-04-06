@@ -17,6 +17,7 @@ import org.apache.cordova.camera.FileHelper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import android.content.Context;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
