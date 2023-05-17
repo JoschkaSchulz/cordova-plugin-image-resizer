@@ -65,7 +65,15 @@ public class ImageResizer extends CordovaPlugin {
                 }
 
                 // load the image from uri
-                Bitmap bitmap = loadScaledBitmapFromUri(uri, width, height);
+              Bitmap bitmap;
+              if(base64)
+              {
+                bitmap = loadScaledBitmapFromBase64(uri,width,height);
+              }
+              else
+              {
+                bitmap = loadScaledBitmapFromUri(uri, width, height);
+              }
 
                 if(bitmap == null){
                   Log.e("Protonet", "There was an error reading the image");
@@ -176,7 +184,25 @@ public class ImageResizer extends CordovaPlugin {
         }
         return null;
     }
+    private Bitmap loadScaledBitmapFromBase64(String uriString, int width, int height) {
+      try {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        //BitmapFactory.decodeStream(FileHelper.getInputStreamFromUriString(uriString, cordova), null, options);
+        byte[] decodedString = Base64.decode(uriString, Base64.DEFAULT);
+        BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        //calc aspect ratio
+        int[] retval = calculateAspectRatio(options.outWidth, options.outHeight);
 
+        options.inJustDecodeBounds = false;
+        options.inSampleSize = calculateSampleSize(options.outWidth, options.outHeight, width, height);
+        Bitmap unscaledBitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        return Bitmap.createScaledBitmap(unscaledBitmap, retval[0], retval[1], true);
+      }catch(Exception e) {
+        Log.e("Protonet", e.toString());
+      }
+      return null;
+    }
     private Uri saveFile(Bitmap bitmap) {
         File folder = null;
         if (folderName == null) {
